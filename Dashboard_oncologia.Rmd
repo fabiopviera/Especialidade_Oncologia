@@ -27,6 +27,7 @@ library(knitr)
 library(kableExtra)
 
 
+
 dat.est.Norte <- read_xlsx("Data/Estabelecimentos_Norte.xlsx")
 dat.est.Nordeste <- read_xlsx("Data/Estabelecimentos_Nordeste.xlsx")
 dat.est.Sudeste <- read_xlsx("Data/Estabelecimentos_Sudeste.xlsx")
@@ -89,7 +90,6 @@ renderPlot({
 
 
 ```
-
 
 
 
