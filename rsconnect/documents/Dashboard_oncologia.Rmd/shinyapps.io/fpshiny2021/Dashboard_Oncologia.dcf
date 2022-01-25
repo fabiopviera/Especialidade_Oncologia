@@ -1,0 +1,11 @@
+name: Dashboard_Oncologia
+title: Dashboard_Oncologia
+username:
+account: fpshiny2021
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5511295
+bundleId: 5507951
+url: https://fpshiny2021.shinyapps.io/Dashboard_Oncologia/
+when: 1643149723.32447
+lastSyncTime: 1643149723.32447
