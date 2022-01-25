@@ -27,17 +27,17 @@ library(knitr)
 library(kableExtra)
 
 
-dat.est.Norte <- read_xlsx("Estabelecimentos_Norte.xlsx")
-dat.est.Nordeste <- read_xlsx("Estabelecimentos_Nordeste.xlsx")
-dat.est.Sudeste <- read_xlsx("Estabelecimentos_Sudeste.xlsx")
-dat.est.Centro.Oeste <- read_xlsx("Estabelecimentos_centro_Oeste.xlsx")
-dat.est.Sul <- read_xlsx("Estabelecimentos_Sul.xlsx")
+dat.est.Norte <- read_xlsx("Data/Estabelecimentos_Norte.xlsx")
+dat.est.Nordeste <- read_xlsx("Data/Estabelecimentos_Nordeste.xlsx")
+dat.est.Sudeste <- read_xlsx("Data/Estabelecimentos_Sudeste.xlsx")
+dat.est.Centro.Oeste <- read_xlsx("Data/Estabelecimentos_centro_Oeste.xlsx")
+dat.est.Sul <- read_xlsx("Data/Estabelecimentos_Sul.xlsx")
 
-load("NORTE_ONCO_COMPLETO.RData")
-load("NORDESTE_ONCO_COMPLETO.RData")
-load("SUDESTE_ONCO_COMPLETO.RData")
-load("CENTRO_OESTE_ONCO_COMPLETO.RData")
-load("SUL_ONCO_COMPLETO.RData")
+load("Data/NORTE_ONCO_COMPLETO.RData")
+load("Data/NORDESTE_ONCO_COMPLETO.RData")
+load("Data/SUDESTE_ONCO_COMPLETO.RData")
+load("Data/CENTRO_OESTE_ONCO_COMPLETO.RData")
+load("Data/SUL_ONCO_COMPLETO.RData")
 ```
 
 
