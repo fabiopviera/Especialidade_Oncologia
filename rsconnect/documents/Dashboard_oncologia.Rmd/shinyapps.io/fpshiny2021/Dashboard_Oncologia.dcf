@@ -5,7 +5,9 @@ account: fpshiny2021
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5511295
-bundleId: 5507951
+bundleId: 5507973
 url: https://fpshiny2021.shinyapps.io/Dashboard_Oncologia/
-when: 1643149723.32447
-lastSyncTime: 1643149723.32447
+when: 1643150109.58552
+lastSyncTime: 1643150109.58552
+asMultiple: FALSE
+asStatic: FALSE
