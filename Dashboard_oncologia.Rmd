@@ -9,15 +9,11 @@ output:
 ---
 
 
+
 ```{r setup, include=FALSE}
-
-library(httr)    
-set_config(use_proxy(url="10.3.100.207",port=8080))
-
-
 library(flexdashboard)
-library(dplyr)
 library(shiny)
+library(dplyr)
 library(ggplot2)
 library(tidyverse)
 library(plotly)
@@ -27,12 +23,13 @@ library(knitr)
 library(kableExtra)
 
 
-
 dat.est.Norte <- read_xlsx("Data/Estabelecimentos_Norte.xlsx")
 dat.est.Nordeste <- read_xlsx("Data/Estabelecimentos_Nordeste.xlsx")
 dat.est.Sudeste <- read_xlsx("Data/Estabelecimentos_Sudeste.xlsx")
 dat.est.Centro.Oeste <- read_xlsx("Data/Estabelecimentos_centro_Oeste.xlsx")
 dat.est.Sul <- read_xlsx("Data/Estabelecimentos_Sul.xlsx")
+
+
 
 load("Data/NORTE_ONCO_COMPLETO.RData")
 load("Data/NORDESTE_ONCO_COMPLETO.RData")
@@ -46,38 +43,40 @@ load("Data/SUL_ONCO_COMPLETO.RData")
 NORTE {data-orientation=colmns data-icon="fas fa-hospital"}
 =============================
 
+
+Inputs {.sidebar data-width=150}
+-----------------------------------------------------------------------
+
+
+```{r norte1}
+selectInput('cnes1','ESCOLHA O CNES',unique(dat.est.Norte$CNES))
+```
+
+
+
 Column 
 --------------------------
 
 ### **PRODUÇÃO DOS HOSPITAIS DE ONCOLOGIA PARA A REGIÃO NORTE**
-```{r norte,echo = FALSE,warning=FALSE}
+
+```{r norte}
 dat.est.Norte %>%
   mutate(PRODUCAO = y) %>%
   select(UF, MUNICIPIO, CNES, ESTABELECIMENTO, PRODUCAO)  %>% unique() %>% 
   DT::datatable(options = list(pageLength = 25), rownames = FALSE)
 ```
 
-Column {.tabset .tabset-fade}
+Column {.tabset }
 --------------------------
 
 
-```{r norte1,echo = FALSE,warning=FALSE}
-
-
-#data_norte %>% select(CNES,DIAG_PRINC,PROC_REA,ESPEC) %>% write_xlsx("NORTE_CANCER_COMPLETO.xlsx")
-
-selectInput('cnes1', 'CNES', dat.est.Norte$CNES)
-
-```
-
-
 ### **DIAGNÓSTICO**
-```{r plotnorte1, echo = FALSE,warning=FALSE}
 
+```{r plotnorte1}
 renderPlot({
   data_norte %>% filter(CNES==input$cnes1) %>% group_by(DIAG_PRINC) %>%
-  summarise(y=n(),.groups = 'drop')  %>% arrange(desc(y)) %>% slice(1:10)%>%
-  ggplot(aes(x = reorder(factor(DIAG_PRINC),y),y=y)) + 
+  summarise(y_=n(),.groups = 'drop')  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+  ggplot(aes(x = reorder(factor(DIAG_PRINC),y_),y=y_)) + 
   geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
   coord_flip()+
   labs(x = "DIAGNÓSTICO PRINCIPAL", y = "NÚMERO DE AIHs", title = "")  +
@@ -96,15 +95,11 @@ renderPlot({
 
 ### **PROCEDIMENTO**
 
-```{r plotnorte2, echo = FALSE}
-##selectedData <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(PROC_REA) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
+```{r plotnorte2}
 renderPlot({
   data_norte %>% filter(CNES==input$cnes1) %>% group_by(PROC_REA) %>%
-  summarise(y=n(),.groups = 'drop')  %>% arrange(desc(y)) %>% slice(1:10)%>%
-  ggplot(aes(x = reorder(factor(PROC_REA),y),y=y)) + 
+  summarise(y_=n(),.groups = 'drop')  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+  ggplot(aes(x = reorder(factor(PROC_REA),y_),y=y_)) + 
   geom_bar(position="dodge", stat="identity",size=1, fill="#E69F00") +
   coord_flip()+
   labs(x = "PROCEDIMENTO REALIZADO", y = "NÚMERO DE AIHs", title = "")  +
@@ -118,12 +113,12 @@ renderPlot({
 
 ### **ESPECIALIDADE**
 
-```{r plotnorte3, echo = FALSE}
+```{r plotnorte3}
 
 renderPlot({
   data_norte %>% filter(CNES==input$cnes1) %>% group_by(ESPEC) %>%
-  summarise(y=n(),.groups = 'drop')  %>% arrange(desc(y)) %>% 
-  ggplot(aes(x = reorder(factor(ESPEC),y),y=y)) + 
+  summarise(y_=n(),.groups = 'drop')  %>% arrange(desc(y_)) %>% 
+  ggplot(aes(x = reorder(factor(ESPEC),y_),y=y_)) + 
   geom_bar(position="dodge", stat="identity",size=1,fill=rgb(0.1,0.4,0.5,0.7)) +
   labs(x = "ESPECIALIDADE", y = "NÚMERO DE AIHs", title = "")  +
   theme_bw() +
@@ -136,15 +131,13 @@ renderPlot({
 
 ### **TIPO DE LEITOS**
 
-```{r tabelanorte, echo = FALSE}
+```{r tabelanorte}
 dat1_ <- data.frame(dat.est.Norte %>% group_by(CNES,LEITO) %>% 
     select(CNES,UF,MUNICIPIO,LEITO, LEITOS_EXISTENTES, LEITOS_SUS )  )
 
 DT::renderDataTable({
  dat1 <- filter(dat1_,CNES==input$cnes1)
   return(dat1[,-1])
-#renderTable({
-#DT::datatable(filter(dat_,CNES==input$cnes), rownames = FALSE)
 })
 
 ```
@@ -154,11 +147,12 @@ DT::renderDataTable({
 
 NORDESTE {data-orientation=colmns data-icon="fas fa-hospital"}
 =============================
-
+  
 Column 
 --------------------------
-
+  
 ### **PRODUÇÃO DOS HOSPITAIS DE ONCOLOGIA PARA A REGIÃO NORDESTE**
+
 ```{r nordeste,echo = FALSE,warning=FALSE}
 dat.est.Nordeste %>%
   mutate(PRODUCAO = y) %>%
@@ -169,44 +163,27 @@ dat.est.Nordeste %>%
 Column {.tabset .tabset-fade}
 --------------------------
 
-
-
-
 ```{r nordeste1,echo = FALSE,warning=FALSE}
-
-
-#dat_cnes <- unique(dat.est.Nordeste$CNES)
-#fillCol(height = 600, flex = c(NA, 1), 
- #inputPanel(
- #    selectInput("cnes", "CNES:", choices = dat.est.Nordeste$CNES)
-#  ),
-##  plotOutput("prodPlot")
-#)
 selectInput('cnes2', 'CNES', dat.est.Nordeste$CNES)
 
 ```
 
 
 ### **DIAGNÓSTICO**
+
 ```{r plotnordeste1, echo = FALSE,warning=FALSE}
-#selectedData1 <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(DIAG_PRINC) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
-
-
 renderPlot({
   data_nordeste %>% filter(CNES==input$cnes2) %>% group_by(DIAG_PRINC) %>%
-  summarise(y=n(),.groups = 'drop')  %>% arrange(desc(y)) %>% slice(1:10)%>%
-  ggplot(aes(x = reorder(factor(DIAG_PRINC),y),y=y)) + 
-  geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
-  coord_flip()+
-  labs(x = "DIAGNÓSTICO PRINCIPAL", y = "NÚMERO DE AIHs", title = "")  +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
-        axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
-       axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
-  )
+    summarise(y_=n(),.groups = 'drop')  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+    ggplot(aes(x = reorder(factor(DIAG_PRINC),y_),y=y_)) + 
+    geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
+    coord_flip()+
+    labs(x = "DIAGNÓSTICO PRINCIPAL", y = "NÚMERO DE AIHs", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    )
 })
 
 
@@ -217,43 +194,35 @@ renderPlot({
 ### **PROCEDIMENTO**
 
 ```{r plotnordeste2, echo = FALSE}
-##selectedData <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(PROC_REA) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
 renderPlot({
   data_nordeste %>% filter(CNES==input$cnes2) %>% group_by(PROC_REA) %>%
-  summarise(y=n(),.groups = 'drop')  %>% arrange(desc(y)) %>% slice(1:10)%>%
-  ggplot(aes(x = reorder(factor(PROC_REA),y),y=y)) + 
-  geom_bar(position="dodge", stat="identity",size=1, fill="#E69F00") +
-  coord_flip()+
-  labs(x = "PROCEDIMENTO REALIZADO", y = "NÚMERO DE AIHs", title = "")  +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
-        axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
-       axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
-  )
+    summarise(y_=n(),.groups = 'drop')  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+    ggplot(aes(x = reorder(factor(PROC_REA),y_),y=y_)) + 
+    geom_bar(position="dodge", stat="identity",size=1, fill="#E69F00") +
+    coord_flip()+
+    labs(x = "PROCEDIMENTO REALIZADO", y = "NÚMERO DE AIHs", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    )
 })
 ```
 
 ### **ESPECIALIDADE**
 
 ```{r plotnordeste3, echo = FALSE}
-##selectedData <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(PROC_REA) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
 renderPlot({
   data_nordeste %>% filter(CNES==input$cnes2) %>% group_by(ESPEC) %>%
-  summarise(y=n(),.groups = 'drop')  %>% arrange(desc(y)) %>%
-  ggplot(aes(x = reorder(factor(ESPEC),y),y=y)) + 
-  geom_bar(position="dodge", stat="identity",size=1,fill=rgb(0.1,0.4,0.5,0.7)) +
-  labs(x = "ESPECIALIDADE", y = "NÚMERO DE AIHs", title = "")  +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
-        axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
-       axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
-  )
+    summarise(y_=n(),.groups = 'drop')  %>% arrange(desc(y_)) %>%
+    ggplot(aes(x = reorder(factor(ESPEC),y_),y=y_)) + 
+    geom_bar(position="dodge", stat="identity",size=1,fill=rgb(0.1,0.4,0.5,0.7)) +
+    labs(x = "ESPECIALIDADE", y = "NÚMERO DE AIHs", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    )
 })
 ```
 
@@ -261,14 +230,12 @@ renderPlot({
 
 ```{r tabelanordeste, echo = FALSE}
 dat2_ <- data.frame(dat.est.Nordeste %>%
-  group_by(CNES,LEITO) %>% 
-    select(CNES,UF,MUNICIPIO,LEITO, LEITOS_EXISTENTES, LEITOS_SUS )  )
+                      group_by(CNES,LEITO) %>% 
+                      select(CNES,UF,MUNICIPIO,LEITO, LEITOS_EXISTENTES, LEITOS_SUS )  )
 
 DT::renderDataTable({
- dat <- filter(dat2_,CNES==input$cnes2)
+  dat <- filter(dat2_,CNES==input$cnes2)
   return(dat[,-1])
-#renderTable({
-#DT::datatable(filter(dat_,CNES==input$cnes), rownames = FALSE)
 })
 
 ```
@@ -279,11 +246,12 @@ DT::renderDataTable({
 
 SUDESTE {data-orientation=colmns data-icon="fas fa-hospital"}
 =============================
-
+  
 Column 
 --------------------------
-
+  
 ### **PRODUÇÃO DOS HOSPITAIS DE ONCOLOGIA PARA A REGIÃO SUDESTE**
+
 ```{r sudeste,echo = FALSE,warning=FALSE}
 dat.est.Sudeste %>%mutate(PRODUCAO = y) %>%
   select(UF, MUNICIPIO, CNES, ESTABELECIMENTO, PRODUCAO)  %>% unique() %>% 
@@ -292,46 +260,30 @@ dat.est.Sudeste %>%mutate(PRODUCAO = y) %>%
 
 Column {.tabset .tabset-fade}
 --------------------------
-
-
+  
 
 ```{r sudeste1,echo = FALSE,warning=FALSE}
-
-
-#dat_cnes <- unique(dat.est.Nordeste$CNES)
-#fillCol(height = 600, flex = c(NA, 1), 
- #inputPanel(
- #    selectInput("cnes", "CNES:", choices = dat.est.Nordeste$CNES)
-#  ),
-##  plotOutput("prodPlot")
-#)
 selectInput('cnes3', 'CNES', dat.est.Sudeste$CNES)
-
 ```
 
 
 
 
 ### **DIAGNÓSTICO**
+
 ```{r plotsudeste1, echo = FALSE,warning=FALSE}
-#selectedData1 <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(DIAG_PRINC) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
-
-
 renderPlot({
   data_sudeste %>% filter(CNES==input$cnes3) %>% group_by(DIAG_PRINC) %>%
-  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)%>%
-  ggplot(aes(x = reorder(factor(DIAG_PRINC),y),y=y)) + 
-  geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
-  coord_flip()+
-  labs(x = "DIAGNÓSTICO PRINCIPAL", y = "NÚMERO DE AIHs", title = "")  +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
-        axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
-       axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
-  )
+    summarise(y_=n())  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+    ggplot(aes(x = reorder(factor(DIAG_PRINC),y_),y=y_)) + 
+    geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
+    coord_flip()+
+    labs(x = "DIAGNÓSTICO PRINCIPAL", y = "NÚMERO DE AIHs", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    )
 })
 
 
@@ -342,43 +294,35 @@ renderPlot({
 ### **PROCEDIMENTO**
 
 ```{r plotsudeste2, echo = FALSE}
-##selectedData <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(PROC_REA) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
 renderPlot({
   data_sudeste %>% filter(CNES==input$cnes3) %>% group_by(PROC_REA) %>%
-  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)%>%
-  ggplot(aes(x = reorder(factor(PROC_REA),y),y=y)) + 
-  geom_bar(position="dodge", stat="identity",size=1, fill="#E69F00") +
-  coord_flip()+
-  labs(x = "PROCEDIMENTO REALIZADO", y = "NÚMERO DE AIHs", title = "")  +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
-        axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
-       axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
-  )
+    summarise(y_=n())  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+    ggplot(aes(x = reorder(factor(PROC_REA),y_),y=y_)) + 
+    geom_bar(position="dodge", stat="identity",size=1, fill="#E69F00") +
+    coord_flip()+
+    labs(x = "PROCEDIMENTO REALIZADO", y = "NÚMERO DE AIHs", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    )
 })
 ```
 
 ### **ESPECIALIDADE**
 
 ```{r plotsudeste3, echo = FALSE}
-##selectedData <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(PROC_REA) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
 renderPlot({
   data_sudeste %>% filter(CNES==input$cnes3) %>% group_by(ESPEC) %>%
-  summarise(y=n())  %>% arrange(desc(y)) %>%
-  ggplot(aes(x = reorder(factor(ESPEC),y),y=y)) + 
-  geom_bar(position="dodge", stat="identity",size=1,fill=rgb(0.1,0.4,0.5,0.7)) +
-  labs(x = "ESPECIALIDADE", y = "NÚMERO DE AIHs", title = "")  +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
-        axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
-       axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
-  )
+    summarise(y=n())  %>% arrange(desc(y_)) %>%
+    ggplot(aes(x = reorder(factor(ESPEC),y_),y=y_)) + 
+    geom_bar(position="dodge", stat="identity",size=1,fill=rgb(0.1,0.4,0.5,0.7)) +
+    labs(x = "ESPECIALIDADE", y = "NÚMERO DE AIHs", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    )
 })
 ```
 
@@ -386,14 +330,12 @@ renderPlot({
 
 ```{r tabelsudeste, echo = FALSE}
 dat3_ <- data.frame(dat.est.Sudeste %>%
-  group_by(CNES,LEITO) %>% 
-    select(CNES,UF,MUNICIPIO,LEITO, LEITOS_EXISTENTES, LEITOS_SUS )  )
+                      group_by(CNES,LEITO) %>% 
+                      select(CNES,UF,MUNICIPIO,LEITO, LEITOS_EXISTENTES, LEITOS_SUS )  )
 
 DT::renderDataTable({
- dat <- filter(dat3_,CNES==input$cnes3)
+  dat <- filter(dat3_,CNES==input$cnes3)
   return(dat[,-1])
-#renderTable({
-#DT::datatable(filter(dat_,CNES==input$cnes), rownames = FALSE)
 })
 
 ```
@@ -401,173 +343,35 @@ DT::renderDataTable({
 
 CENTRO-OESTE {data-orientation=colmns data-icon="fas fa-hospital"}
 =============================
-
+  
 Column 
 --------------------------
-
+  
 ### **PRODUÇÃO DOS HOSPITAIS DE ONCOLOGIA PARA A REGIÃO CENTRO-OESTE**
+
 ```{r centro,echo = FALSE,warning=FALSE}
 dat.est.Centro.Oeste %>%mutate(PRODUCAO = y) %>%
   select(UF, MUNICIPIO, CNES, ESTABELECIMENTO, PRODUCAO)  %>% unique() %>% 
   DT::datatable(options = list(pageLength = 25), rownames = FALSE)
 ```
 
+
 Column {.tabset .tabset-fade}
 --------------------------
 
-
-
-
+  
 ```{r centro1,echo = FALSE,warning=FALSE}
-
-#saveRDS(data_centro_oeste, file="df.Rda")
-#data_centro_oeste <- readRDS(file="df.Rda")
-#dat_cnes <- unique(dat.est.Nordeste$CNES)
-#fillCol(height = 600, flex = c(NA, 1), 
- #inputPanel(
- #    selectInput("cnes", "CNES:", choices = dat.est.Nordeste$CNES)
-#  ),
-##  plotOutput("prodPlot")
-#)
 selectInput('cnes4', 'CNES', dat.est.Centro.Oeste$CNES)
-
 ```
 
 
 ### **DIAGNÓSTICO**
+
 ```{r plotcentro1, echo = FALSE,warning=FALSE}
-#selectedData1 <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(DIAG_PRINC) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
-
-
 renderPlot({
   data_centro_oeste %>% filter(CNES==input$cnes4) %>% group_by(DIAG_PRINC) %>%
-  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)%>%
-  ggplot(aes(x = reorder(factor(DIAG_PRINC),y),y=y)) + 
-  geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
-  coord_flip()+
-  labs(x = "DIAGNÓSTICO PRINCIPAL", y = "NÚMERO DE AIHs", title = "")  +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
-        axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
-       axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
-  )
-})
-
-
-```
-
-
-
-### **PROCEDIMENTO**
-
-```{r plotcentro2, echo = FALSE}
-##selectedData <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(PROC_REA) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
-renderPlot({
-  data_centro_oeste %>% filter(CNES==input$cnes4) %>% group_by(PROC_REA) %>%
-  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)%>%
-  ggplot(aes(x = reorder(factor(PROC_REA),y),y=y)) + 
-  geom_bar(position="dodge", stat="identity",size=1, fill="#E69F00") +
-  coord_flip()+
-  labs(x = "PROCEDIMENTO REALIZADO", y = "NÚMERO DE AIHs", title = "")  +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
-        axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
-       axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
-  )
-})
-```
-
-### **ESPECIALIDADE**
-
-```{r plotcentro3, echo = FALSE}
-##selectedData <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(PROC_REA) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
-renderPlot({
-  data_centro_oeste %>% filter(CNES==input$cnes4) %>% group_by(ESPEC) %>%
-  summarise(y=n())  %>% arrange(desc(y)) %>%
-  ggplot(aes(x = reorder(factor(ESPEC),y),y=y)) + 
-  geom_bar(position="dodge", stat="identity",size=1,fill=rgb(0.1,0.4,0.5,0.7)) +
-  labs(x = "ESPECIALIDADE", y = "NÚMERO DE AIHs", title = "")  +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
-        axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
-       axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
-  )
-})
-```
-
-### **TIPO DE LEITOS**
-
-```{r tabelacentro, echo = FALSE}
-dat4_ <- data.frame(dat.est.Centro.Oeste %>% group_by(CNES,LEITO) %>% 
-    select(CNES,UF,MUNICIPIO,LEITO, LEITOS_EXISTENTES, LEITOS_SUS )  )
-
-DT::renderDataTable({
- dat <- filter(dat4_,CNES==input$cnes4)
-  return(dat[,-1])
-#renderTable({
-#DT::datatable(filter(dat_,CNES==input$cnes), rownames = FALSE)
-})
-
-```
-
-
-
-SUL {data-orientation=colmns data-icon="fas fa-hospital"}
-=============================
-  
-Column 
---------------------------
-
-
-
-### **PRODUÇÃO DOS HOSPITAIS DE ONCOLOGIA PARA A REGIÃO SUL**
-```{r sul,echo = FALSE,warning=FALSE}
-dat.est.Sul %>%mutate(PRODUCAO = y) %>%
-  select(UF, MUNICIPIO, CNES, ESTABELECIMENTO, PRODUCAO)  %>% unique() %>% 
-  DT::datatable(options = list(pageLength = 25), rownames = FALSE)
-```
-
-
-
-Column {.tabset .tabset-fade}
---------------------------
-  
-
-```{r sul1,echo = FALSE,warning=FALSE}
-
-#dat_cnes <- unique(dat.est.Nordeste$CNES)
-#fillCol(height = 600, flex = c(NA, 1), 
-#inputPanel(
-#    selectInput("cnes", "CNES:", choices = dat.est.Nordeste$CNES)
-#  ),
-##  plotOutput("prodPlot")
-#)
-selectInput('cnes5', 'CNES', dat.est.Sul$CNES)
-
-```
-
-
-### **DIAGNÓSTICO**
-```{r plotsul1, echo = FALSE,warning=FALSE}
-#selectedData1 <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(DIAG_PRINC) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
-
-
-renderPlot({
-  data_sul %>% filter(CNES==input$cnes5) %>% group_by(DIAG_PRINC) %>%
-    summarise(y=n(),.groups = 'drop')  %>% arrange(desc(y)) %>% slice(1:10)%>%
-    ggplot(aes(x = reorder(factor(DIAG_PRINC),y),y=y)) + 
+    summarise(y_=n())  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+    ggplot(aes(x = reorder(factor(DIAG_PRINC),y_),y=y_)) + 
     geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
     coord_flip()+
     labs(x = "DIAGNÓSTICO PRINCIPAL", y = "NÚMERO DE AIHs", title = "")  +
@@ -581,18 +385,109 @@ renderPlot({
 ```
 
 
+### **PROCEDIMENTO**
+
+```{r plotcentro2, echo = FALSE}
+renderPlot({
+  data_centro_oeste %>% filter(CNES==input$cnes4) %>% group_by(PROC_REA) %>%
+    summarise(y_=n())  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+    ggplot(aes(x = reorder(factor(PROC_REA),y_),y=y_)) + 
+    geom_bar(position="dodge", stat="identity",size=1, fill="#E69F00") +
+    coord_flip()+
+    labs(x = "PROCEDIMENTO REALIZADO", y = "NÚMERO DE AIHs", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    )
+})
+```
+
+### **ESPECIALIDADE**
+
+```{r plotcentro3, echo = FALSE}
+renderPlot({
+  data_centro_oeste %>% filter(CNES==input$cnes4) %>% group_by(ESPEC) %>%
+    summarise(y_=n())  %>% arrange(desc(y_)) %>%
+    ggplot(aes(x = reorder(factor(ESPEC),y_),y=y_)) + 
+    geom_bar(position="dodge", stat="identity",size=1,fill=rgb(0.1,0.4,0.5,0.7)) +
+    labs(x = "ESPECIALIDADE", y = "NÚMERO DE AIHs", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    )
+})
+```
+
+### **TIPO DE LEITOS**
+
+```{r tabelacentro, echo = FALSE}
+dat4_ <- data.frame(dat.est.Centro.Oeste %>% group_by(CNES,LEITO) %>% 
+                      select(CNES,UF,MUNICIPIO,LEITO, LEITOS_EXISTENTES, LEITOS_SUS )  )
+
+DT::renderDataTable({
+  dat <- filter(dat4_,CNES==input$cnes4)
+  return(dat[,-1])
+})
+```
+
+
+
+SUL {data-orientation=colmns data-icon="fas fa-hospital"}
+=============================
+  
+Column 
+--------------------------
+  
+  
+  
+### **PRODUÇÃO DOS HOSPITAIS DE ONCOLOGIA PARA A REGIÃO SUL**
+
+```{r sul,echo = FALSE,warning=FALSE}
+dat.est.Sul %>%mutate(PRODUCAO = y) %>%
+  select(UF, MUNICIPIO, CNES, ESTABELECIMENTO, PRODUCAO)  %>% unique() %>% 
+  DT::datatable(options = list(pageLength = 25), rownames = FALSE)
+```
+
+
+
+Column {.tabset .tabset-fade}
+--------------------------
+  
+  
+```{r sul1,echo = FALSE,warning=FALSE}
+selectInput('cnes5', 'CNES', dat.est.Sul$CNES)
+```
+
+
+### **DIAGNÓSTICO**
+
+```{r plotsul1, echo = FALSE,warning=FALSE}
+renderPlot({
+  data_sul %>% filter(CNES==input$cnes5) %>% group_by(DIAG_PRINC) %>%
+    summarise(y_=n(),.groups = 'drop')  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+    ggplot(aes(x = reorder(factor(DIAG_PRINC),y_),y=y_)) + 
+    geom_bar(position="dodge", stat="identity",size=1, fill="steelblue") +
+    coord_flip()+
+    labs(x = "DIAGNÓSTICO PRINCIPAL", y = "NÚMERO DE AIHs", title = "")  +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 15),axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15), axis.text.y = element_text(size = 15),
+          axis.title = element_text(size=15),legend.text = element_text(size=15),legend.title = element_text(size=15)
+    )
+})
+
+```
+
 
 ### **PROCEDIMENTO**
 
 ```{r plotsul2, echo = FALSE}
-##selectedData <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(PROC_REA) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
 renderPlot({
   data_sul %>% filter(CNES==input$cnes5) %>% group_by(PROC_REA) %>%
-    summarise(y=n(),.groups = 'drop')  %>% arrange(desc(y)) %>% slice(1:10)%>%
-    ggplot(aes(x = reorder(factor(PROC_REA),y),y=y)) + 
+    summarise(y_=n(),.groups = 'drop')  %>% arrange(desc(y_)) %>% slice(1:10)%>%
+    ggplot(aes(x = reorder(factor(PROC_REA),y_),y=y_)) + 
     geom_bar(position="dodge", stat="identity",size=1, fill="#E69F00") +
     coord_flip()+
     labs(x = "PROCEDIMENTO REALIZADO", y = "NÚMERO DE AIHs", title = "")  +
@@ -607,14 +502,10 @@ renderPlot({
 ### **ESPECIALIDADE**
 
 ```{r plotsul3, echo = FALSE}
-##selectedData <- reactive({
-#data_x %>% filter(CNES==input$cnes) %>% group_by(PROC_REA) %>%
-#  summarise(y=n())  %>% arrange(desc(y)) %>% slice(1:10)
-#})
 renderPlot({
   data_sul %>% filter(CNES==input$cnes5) %>% group_by(ESPEC) %>%
-    summarise(y=n())  %>% arrange(desc(y)) %>%
-    ggplot(aes(x = reorder(factor(ESPEC),y),y=y)) + 
+    summarise(y_=n())  %>% arrange(desc(y_)) %>%
+    ggplot(aes(x = reorder(factor(ESPEC),y_),y=y_)) + 
     geom_bar(position="dodge", stat="identity",size=1,fill=rgb(0.1,0.4,0.5,0.7)) +
     labs(x = "ESPECIALIDADE", y = "NÚMERO DE AIHs", title = "")  +
     theme_bw() +
@@ -635,8 +526,6 @@ dat5_ <- data.frame(dat.est.Sul %>%
 DT::renderDataTable({
   dat <- filter(dat5_,CNES==input$cnes5)
   return(dat[,-1])
-  #renderTable({
-  #DT::datatable(filter(dat_,CNES==input$cnes), rownames = FALSE)
 })
 
 ```
